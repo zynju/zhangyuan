@@ -25,6 +25,11 @@
     margin-right: 1rem;
     white-space: nowrap;
   }
+  .news-title-plain {
+  font-weight: 500;
+  color: #24292e;        /* 普通文本颜色，略淡于链接 */
+  /* 不设下划线，鼠标无变化 */
+}
   .news-title {
     font-weight: 500;
     color: #0366d6;
@@ -342,7 +347,7 @@ Fundamentals of Cryptography, 2014-now, Nanjing University.</li><br>
   // ---------- 新闻数据（示例，请替换为您实际新闻） ----------
   const allNews = [
     { date: "2026-05-25", title: "Kang Liu attended ICC'26 at Glasgow, Scotland, UK to present our paper", url: "#"},
-    { date: "2026-05-21", title: "Congrats to Anyi Cao, Yu Li, and Zhentai Xie for successfully defending their master theses!"}
+    { date: "2026-05-21", title: "Congrats to Anyi Cao, Yu Li, and Zhentai Xie for successfully defending their master theses!", url: "#"}
   ];
 
   const DEFAULT_VISIBLE_COUNT = 5;   // 默认显示5条
@@ -352,31 +357,38 @@ Fundamentals of Cryptography, 2014-now, Nanjing University.</li><br>
   const toggleBtn = document.getElementById('toggleNewsBtn');
 
   // 渲染新闻列表
-  function renderNews() {
-    let visibleNews;
-    if (currentState === 'collapsed') {
-      visibleNews = allNews.slice(0, DEFAULT_VISIBLE_COUNT);
-    } else {
-      visibleNews = allNews;
-    }
+function renderNews() {
+  let visibleNews;
+  if (currentState === 'collapsed') {
+    visibleNews = allNews.slice(0, DEFAULT_VISIBLE_COUNT);
+  } else {
+    visibleNews = allNews;
+  }
 
-    const html = visibleNews.map(news => `
+  const html = visibleNews.map(news => {
+    // 判断是否有有效链接
+    const hasValidUrl = news.url && news.url !== "#";
+    const titleElement = hasValidUrl
+      ? `<a href="${news.url}" class="news-title" target="_blank">${news.title}</a>`
+      : `<span class="news-title-plain">${news.title}</span>`;
+    
+    return `
       <li>
         <span class="news-date">${news.date}</span>
-        <a href="${news.url}" class="news-title" target="_blank">${news.title}</a>
+        ${titleElement}
       </li>
-    `).join('');
+    `;
+  }).join('');
 
-    newsListEl.innerHTML = html;
+  newsListEl.innerHTML = html;
 
-    // 控制按钮显示及文字
-    if (allNews.length <= DEFAULT_VISIBLE_COUNT) {
-      toggleBtn.style.display = 'none';
-    } else {
-      toggleBtn.style.display = 'inline-block';
-      toggleBtn.textContent = currentState === 'collapsed' ? 'More' : 'Less';
-    }
+  if (allNews.length <= DEFAULT_VISIBLE_COUNT) {
+    toggleBtn.style.display = 'none';
+  } else {
+    toggleBtn.style.display = 'inline-block';
+    toggleBtn.textContent = currentState === 'collapsed' ? 'More' : 'Less';
   }
+}
 
   // 切换显示更多/更少
   function toggleNews() {
